@@ -13,7 +13,7 @@ exports.handler = async function (event) {
         messages: [
           {
             role: "system",
-            content: "You are a stock analyst. Answer ONLY with: Bullish, Bearish or Neutral."
+            content: "You are a professional stock trader. Analyze if this news will move stock prices. Positive = Bullish, Negative = Bearish, unclear = Neutral. Answer ONLY with one word."
           },
           {
             role: "user",
