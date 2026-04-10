@@ -1,7 +1,6 @@
 exports.handler = async function () {
   try {
     const stocks = ["AAPL", "TSLA", "MSFT"];
-
     let allNews = [];
 
     for (let stock of stocks) {
@@ -11,8 +10,12 @@ exports.handler = async function () {
 
       const data = await res.json();
 
+      console.log("NEWS API:", data); // 🔥 DEBUG
+
+      if (!data.articles) continue; // ✅ verhindert Crash
+
       const articles = data.articles.map(a => ({
-        title: a.title,
+        title: a.title || "No title",
         stock: stock
       }));
 
@@ -25,9 +28,13 @@ exports.handler = async function () {
     };
 
   } catch (error) {
+    console.error("NEWS ERROR:", error);
+
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message })
+      body: JSON.stringify({
+        error: error.message
+      })
     };
   }
 };
