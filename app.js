@@ -1,64 +1,56 @@
 async function loadNews() {
-  const res = await fetch('/.netlify/functions/news');
-  const data = await res.json();
+  try {
+    const res = await fetch('/.netlify/functions/news');
+    const data = await res.json();
 
-  const container = document.getElementById('news');
-  container.innerHTML = '';
+    const container = document.getElementById('news');
+    container.innerHTML = '';
 
-  for (const article of data) {
+    for (const article of data) {
 
-    // 🤖 KI Analyse holen
-    const aiRes = await fetch('/.netlify/functions/analyze', {
-      method: 'POST',
-      body: JSON.stringify({ text: article.title })
-    });
+      let aiResult = "Loading...";
 
-    const aiData = await aiRes.json();
+      try {
+        const aiRes = await fetch('/.netlify/functions/analyze', {
+          method: 'POST',
+          body: JSON.stringify({ text: article.title })
+        });
 
-    const div = document.createElement('div');
+        const aiData = await aiRes.json();
+        aiResult = aiData.result;
 
-    // 🎨 Design
-    div.style.marginBottom = "20px";
-    div.style.padding = "20px";
-    div.style.borderRadius = "12px";
-    div.style.background = "#ffffff";
-    div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-    div.style.transition = "0.2s";
+      } catch (err) {
+        aiResult = "Error";
+        console.log("AI Fehler:", err);
+      }
 
-    // Hover
-    div.onmouseover = () => div.style.transform = "scale(1.02)";
-    div.onmouseout = () => div.style.transform = "scale(1)";
+      const div = document.createElement('div');
 
-    // 🧾 Inhalt
-    const title = document.createElement('div');
-    title.innerText = article.title;
-    title.style.fontWeight = "bold";
-    title.style.fontSize = "18px";
-    title.style.marginBottom = "10px";
+      div.style.marginBottom = "20px";
+      div.style.padding = "20px";
+      div.style.borderRadius = "12px";
+      div.style.background = "#fff";
+      div.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
 
-    const ai = document.createElement('div');
-    ai.innerText = "AI: " + aiData.result;
+      const title = document.createElement('div');
+      title.innerText = article.title;
+      title.style.fontWeight = "bold";
 
-    // Farbe je nach Ergebnis
-    if (aiData.result.includes("Bullish")) {
-      ai.style.color = "green";
-    } else if (aiData.result.includes("Bearish")) {
-      ai.style.color = "red";
-    } else {
-      ai.style.color = "gray";
+      const ai = document.createElement('div');
+      ai.innerText = "AI: " + aiResult;
+
+      if (aiResult.includes("Bullish")) ai.style.color = "green";
+      else if (aiResult.includes("Bearish")) ai.style.color = "red";
+      else ai.style.color = "gray";
+
+      div.appendChild(title);
+      div.appendChild(ai);
+
+      container.appendChild(div);
     }
 
-    // 📊 Fake Stock Tag (Upgrade später möglich)
-    const stock = document.createElement('div');
-    stock.innerText = "Stock: AI detected market sentiment";
-    stock.style.fontSize = "12px";
-    stock.style.opacity = "0.6";
-
-    div.appendChild(title);
-    div.appendChild(ai);
-    div.appendChild(stock);
-
-    container.appendChild(div);
+  } catch (error) {
+    console.error("Fehler:", error);
   }
 }
 
