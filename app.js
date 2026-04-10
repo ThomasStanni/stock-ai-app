@@ -14,3 +14,5 @@ async function loadNews() {
 }
 
 loadNews();
+div.style.marginBottom = "10px";
+div.style.fontWeight = "bold";
