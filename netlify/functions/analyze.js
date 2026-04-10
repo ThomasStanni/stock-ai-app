@@ -1,33 +1,49 @@
 exports.handler = async function (event) {
-  const { text } = JSON.parse(event.body);
+  try {
+    const { text } = JSON.parse(event.body);
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: "You are a stock analyst. Answer ONLY with: Bullish, Bearish or Neutral."
-        },
-        {
-          role: "user",
-          content: text
-        }
-      ]
-    })
-  });
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "You are a stock analyst. Answer ONLY with: Bullish, Bearish or Neutral."
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ]
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      result: data.choices[0].message.content
-    })
-  };
+    console.log("OPENAI RESPONSE:", data); // 🔥 DEBUG
+
+    // ✅ SAFE CHECK
+    const result =
+      data?.choices?.[0]?.message?.content || "Neutral";
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ result })
+    };
+
+  } catch (error) {
+    console.error("FUNCTION ERROR:", error);
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: error.message
+      })
+    };
+  }
 };
