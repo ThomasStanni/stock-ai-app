@@ -37,7 +37,7 @@ async function loadNews() {
 
       // 📰 TITLE
       const title = document.createElement("div");
-      title.innerText = article.title;
+      title.innerText = article.stock + ": " + article.title;
       title.style.fontWeight = "bold";
       title.style.fontSize = "18px";
       title.style.marginBottom = "10px";
