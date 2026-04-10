@@ -12,8 +12,9 @@ async function loadNews() {
       try {
         const aiRes = await fetch("/.netlify/functions/analyze", {
           method: "POST",
-          body: JSON.stringify({ text: article.title })
-        });
+          body: JSON.stringify({
+  text: article.title + ". " + (article.description || "")
+})
 
         const aiData = await aiRes.json();
 
